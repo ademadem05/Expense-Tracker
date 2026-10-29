@@ -90,6 +90,25 @@ def delete_expense(expense_id):
             return
     print(f"Expense {expense_id} is not found")
 
+
+def update_expenses(expense_id, description, amount):
+    expenses = load_expense()
+    for expense in expenses:
+        if expense["id"] == expense_id:
+            if description is not None:
+                expense["description"] = description
+
+            if amount is not None:
+                expense["amount"] = amount
+
+            save_expense(expenses)
+            print(f"Expense {expense_id} updated successfully")
+            return
+    print(f"Expense {expense_id} is not found")
+
+
+
+
 def main():
    
     parser = argparse.ArgumentParser()
@@ -108,6 +127,11 @@ def main():
     delete_parser = subparsers.add_parser("delete")
     delete_parser.add_argument("--id", type=int, required=True)
 
+    update_parser = subparsers.add_parser("update")
+    update_parser.add_argument("--id", type=int, required=True)
+    update_parser.add_argument("--description")
+    update_parser.add_argument("--amount", type=float)
+
     args = parser.parse_args()
     if args.command == "add":
         if args.amount <= 0:
@@ -124,8 +148,14 @@ def main():
     elif args.command == "summary":
         summary_list(args.month)
 
+    elif args.command == "update":
+        if args.description is None and args.amount is None:
+            print("Error: provide --description or --amount to update")
+        elif args.amount is not None and args.amount <= 0:
+            print("Error: amount must be greater than 0")
+        else:
+            update_expenses(args.id, args.description, args.amount)
 
-    
 
     else:
         parser.print_help()
