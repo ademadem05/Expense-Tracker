@@ -79,6 +79,17 @@ def summary_list(month=None):
         print(f"Total expenses for {calendar.month_name[month]}: ${total:.2f}")
 
 
+def delete_expense(expense_id):
+    expenses = load_expense()
+
+    for expense in expenses:
+        if expense["id"] == expense_id:
+            expenses.remove(expense)
+            save_expense(expenses)
+            print(f"Expense {expense_id} deleted successfully")
+            return
+    print(f"Expense {expense_id} is not found")
+
 def main():
    
     parser = argparse.ArgumentParser()
@@ -93,6 +104,10 @@ def main():
     summary_parser = subparsers.add_parser("summary")
     summary_parser.add_argument("--month",type=int ,choices=range(1, 13))
 
+
+    delete_parser = subparsers.add_parser("delete")
+    delete_parser.add_argument("--id", type=int, required=True)
+
     args = parser.parse_args()
     if args.command == "add":
         if args.amount <= 0:
@@ -103,8 +118,14 @@ def main():
     elif args.command == "list":
         list_expenses()
 
+    elif args.command == "delete":
+        delete_expense(args.id) 
+
     elif args.command == "summary":
         summary_list(args.month)
+
+
+    
 
     else:
         parser.print_help()
