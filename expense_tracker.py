@@ -3,6 +3,7 @@ import os
 import json
 from datetime import datetime
 import argparse
+import calendar
 
 EXPENSES_FILE = "expenses.json"
 
@@ -57,6 +58,27 @@ def list_expenses():
         print(f"No expenses found.")
 
 
+def summary_list(month=None):
+    expenses = load_expense()
+    current_year = datetime.now().year
+    total = 0
+
+    for expense in expenses:
+        parts = expense["date"].split("-")
+        expense_year = int(parts[0])
+        expense_month = int(parts[1])
+
+        if month is None:
+            total += expense["amount"]
+        elif expense_year == current_year and expense_month == month:
+            total += expense["amount"]
+
+    if month is None:
+        print(f"Total expenses: ${total:.2f}")
+    else:
+        print(f"Total expenses for {calendar.month_name[month]}: ${total:.2f}")
+
+
 def main():
    
     parser = argparse.ArgumentParser()
@@ -68,7 +90,8 @@ def main():
 
     list_parser = subparsers.add_parser("list")
 
-
+    summary_parser = subparsers.add_parser("summary")
+    summary_parser.add_argument("--month",type=int ,choices=range(1, 13))
 
     args = parser.parse_args()
     if args.command == "add":
@@ -79,6 +102,9 @@ def main():
 
     elif args.command == "list":
         list_expenses()
+
+    elif args.command == "summary":
+        summary_list(args.month)
 
     else:
         parser.print_help()
