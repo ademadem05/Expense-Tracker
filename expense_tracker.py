@@ -44,6 +44,19 @@ def add_expense(amount, description):
     print(f"Expense added successfully (ID: {new_id}) ")
 
 
+
+def list_expenses():
+
+    expenses = load_expense()
+
+    if expenses:
+        print(f"{'ID':<4}{'Date':<12}{'Description':<15}{'Amount'}")
+        for expense in expenses:
+            print(f"{expense['id']:<4}{expense['date']:<12}{expense['description']:<15}${expense['amount']:.2f}")
+    else:
+        print(f"No expenses found.")
+
+
 def main():
    
     parser = argparse.ArgumentParser()
@@ -53,6 +66,9 @@ def main():
     add_parser.add_argument("--description", required=True)
     add_parser.add_argument("--amount", type=float, required=True)
 
+    list_parser = subparsers.add_parser("list")
+
+
 
     args = parser.parse_args()
     if args.command == "add":
@@ -60,8 +76,14 @@ def main():
            print("Error: amount must be greater than 0")
         else:
             add_expense(args.amount, args.description)
+
+    elif args.command == "list":
+        list_expenses()
+
     else:
         parser.print_help()
+
+    
 
 
 if __name__ == "__main__":
